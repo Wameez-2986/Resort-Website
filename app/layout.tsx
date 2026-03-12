@@ -27,8 +27,8 @@ const montserrat = Montserrat({
 });
 
 export const metadata: Metadata = {
-  title: "Talav Resort - Menu",
-  description: "Luxury QR Menu for Talav Resort",
+  title: "Talav Resort",
+  description: "A Luxury Resort",
 };
 
 export default function RootLayout({
@@ -39,10 +39,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable} ${montserrat.variable} antialiased min-h-screen flex flex-col font-sans`}
+        className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable} ${montserrat.variable} antialiased min-h-screen flex flex-col font-sans bg-[#0F0F0F] text-white w-full`}
       >
         <Header />
-        <main className="flex-1 w-full mx-auto relative bg-background shadow-2xl">
+        <main className="flex-1 w-full relative">
           {children}
         </main>
       </body>
