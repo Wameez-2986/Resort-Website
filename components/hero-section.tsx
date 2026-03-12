@@ -2,6 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
 const IMAGES = [
   "/exterior/img 1.png",
@@ -98,15 +99,19 @@ export function HeroSection() {
         </motion.p>
 
         {/* Explore CTA */}
-        <motion.button
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.9, duration: 0.8 }}
-          onClick={scrollToMenu}
-          className="mt-12 px-8 py-3 bg-accent text-black font-semibold rounded-full hover:bg-yellow-500 hover:shadow-[0_0_20px_rgba(201,162,39,0.5)] transition-all duration-300 font-montserrat"
+          className="mt-12"
         >
-          Explore Menu
-        </motion.button>
+          <Link
+            href="/menu"
+            className="inline-block px-8 py-3 bg-accent text-black font-semibold rounded-full hover:bg-yellow-500 hover:shadow-[0_0_20px_rgba(201,162,39,0.5)] transition-all duration-300 font-montserrat"
+          >
+            Explore Menu
+          </Link>
+        </motion.div>
       </div>
 
       {/* Bottom Category Quick Links */}

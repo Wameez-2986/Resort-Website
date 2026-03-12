@@ -1,0 +1,76 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Admin {
+  id        Int      @id @default(autoincrement())
+  pin       String   @unique
+  createdAt DateTime @default(now())
+}
+
+model Category {
+  id           String     @id @default(cuid())
+  name         String     @unique
+  image        String?
+  displayOrder Int        @default(0)
+  createdAt    DateTime   @default(now())
+  menuItems    MenuItem[]
+}
+
+model MenuItem {
+  id          String      @id @default(cuid())
+  name        String
+  description String?
+  price       Float
+  image       String?
+  available   Boolean     @default(true)
+  categoryId  String
+  category    Category    @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  createdAt   DateTime    @default(now())
+  orderItems  OrderItem[]
+
+  @@index([categoryId])
+}
+
+enum OrderStatus {
+  Pending
+  Preparing
+  Ready
+  Served
+}
+
+model Order {
+  id          String      @id @default(cuid())
+  tableNumber String
+  status      OrderStatus @default(Pending)
+  totalPrice  Float
+  items       OrderItem[]
+  createdAt   DateTime    @default(now())
+
+  @@index([createdAt])
+}
+
+model OrderItem {
+  id         String   @id @default(cuid())
+  orderId    String
+  order      Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  menuItemId String
+  menuItem   MenuItem @relation(fields: [menuItemId], references: [id], onDelete: Cascade)
+  quantity   Int      @default(1)
+  price      Float    // Historical price at time of order
+  createdAt  DateTime @default(now())
+
+  @@index([orderId])
+}
