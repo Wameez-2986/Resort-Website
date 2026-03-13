@@ -88,7 +88,7 @@ export default function CategoryPage({
     <div className="w-full flex flex-col min-h-screen pb-32">
       {/* Sticky Header */}
       <header className="sticky top-0 z-40 w-full bg-[#0F0F0F]/90 backdrop-blur-md border-b border-white/10 px-4 py-4 md:px-8 flex flex-col gap-4">
-        <div className="flex items-center justify-between w-full max-w-5xl mx-auto">
+        <div className="flex items-center w-full max-w-5xl mx-auto">
           <Link
             href="/menu"
             className="p-2 -ml-2 text-white/70 hover:text-accent transition-colors flex items-center justify-center rounded-full hover:bg-white/5"
@@ -96,12 +96,6 @@ export default function CategoryPage({
           >
             <ArrowLeft className="w-6 h-6" />
           </Link>
-
-          <h1 className="text-xl md:text-2xl font-playfair font-bold text-white tracking-wider absolute left-1/2 -translate-x-1/2">
-            TALAV RESORT
-          </h1>
-
-          <div className="w-10" />
         </div>
 
         {/* Category Title */}

@@ -9,12 +9,13 @@ import { CartDrawer } from "@/components/cart-drawer";
 export function GlobalUI() {
   const pathname = usePathname();
   const isAdmin = pathname.startsWith("/talav-control-panel");
+  const showHeader = pathname === "/" || pathname === "/menu";
 
   if (isAdmin) return null;
 
   return (
     <>
-      <Header />
+      {showHeader && <Header />}
       <FloatingCart />
       <CartDrawer />
     </>

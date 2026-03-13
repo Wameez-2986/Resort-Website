@@ -25,6 +25,37 @@ const itemVariants = {
   show: { opacity: 1, y: 0, transition: { duration: 0.5 } },
 };
 
+// ── Image lookup from public/categories ──────────────────────────────────────
+const CATEGORY_IMAGES: Record<string, string> = {
+  "tandoor starter(veg)":             "/categories/tandoor starter(veg).png",
+  "tandoor starter(non-veg)":         "/categories/tandoor starter(non-veg).png",
+  "chineese noodles & rice(veg)":     "/categories/chinese starter & rice(veg).png",
+  "chineese noodles & rice(non-veg)": "/categories/chinese starter & rice(non-veg).png",
+  "chinese noodles & rice(veg)":      "/categories/chinese starter & rice(veg).png",
+  "chinese noodles & rice(non-veg)":  "/categories/chinese starter & rice(non-veg).png",
+  "chineese starter(veg)":            "/categories/chinese starter & rice(veg).png",
+  "chineese starter(non-veg)":        "/categories/chinese starter & rice(non-veg).png",
+  "chinese starter(veg)":             "/categories/chinese starter & rice(veg).png",
+  "chinese starter(non-veg)":         "/categories/chinese starter & rice(non-veg).png",
+  "kofta khajana":                    "/categories/kofta khajana.png",
+  "kaju flavor":                      "/categories/Kaju flavor.png",
+  "chicken main course":              "/categories/chicken main course.png",
+  "fish main course":                 "/categories/fish.png",
+  "fish":                             "/categories/fish.png",
+  "sizzler(veg)":                     "/categories/sizzler(veg).png",
+  "sizzler(non-veg)":                 "/categories/sizzler(non-veg).png",
+  "veg main course":                  "/categories/veg main course.png",
+  "paneer main course":               "/categories/paneer main course.png",
+};
+
+const DEFAULT_CAT_IMAGE = "/categories/kofta khajana.png";
+
+function getCategoryImage(cat: { name: string; image: string | null }): string {
+  if (cat.image) return cat.image; // admin-uploaded takes priority
+  return CATEGORY_IMAGES[cat.name.toLowerCase().trim()] ?? DEFAULT_CAT_IMAGE;
+}
+
+
 export function CategoryCards() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
@@ -88,11 +119,11 @@ export function CategoryCards() {
               {/* Background Image */}
               <div className="absolute inset-0 bg-[#1E1E1E]">
                 <img
-                  src={category.image || "/interior/img 6.png"}
+                  src={getCategoryImage(category)}
                   alt={category.name}
                   className="w-full h-full object-cover opacity-60 group-hover:scale-110 transition-transform duration-700 ease-in-out"
                   onError={(e) => {
-                    (e.target as HTMLImageElement).src = "/interior/img 6.png";
+                    (e.target as HTMLImageElement).src = DEFAULT_CAT_IMAGE;
                   }}
                 />
               </div>
