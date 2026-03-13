@@ -2,10 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Playfair_Display, Montserrat } from "next/font/google";
 import "./globals.css";
 
-import { Header } from "@/components/header";
 import { CartProvider } from "@/context/cart-context";
-import { FloatingCart } from "@/components/floating-cart";
-import { CartDrawer } from "@/components/cart-drawer";
+import { GlobalUI } from "@/components/global-ui";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -45,14 +43,13 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable} ${montserrat.variable} antialiased min-h-screen flex flex-col font-sans bg-[#0F0F0F] text-white w-full`}
       >
         <CartProvider>
-          <Header />
+          <GlobalUI />
           <main className="flex-1 w-full relative">
             {children}
           </main>
-          <FloatingCart />
-          <CartDrawer />
         </CartProvider>
       </body>
     </html>
   );
 }
+

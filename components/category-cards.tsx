@@ -3,43 +3,20 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { UtensilsCrossed } from "lucide-react";
 
-const CATEGORIES = [
-  { name: "Tandoor Starter(Veg)", slug: "tandoor-starter-veg" },
-  { name: "Tandoor Starter(Non-Veg)", slug: "tandoor-starter-non-veg" },
-  { name: "Chineese Noodles & Rice(Veg)", slug: "chineese-noodles-rice-veg" },
-  { name: "Chineese Noodles & Rice(Non-Veg)", slug: "chineese-noodles-rice-non-veg" },
-  { name: "Kofta Khajana", slug: "kofta-khajana" },
-  { name: "Kaju Flavor", slug: "kaju-flavor" },
-  { name: "Chicken Main Course", slug: "chicken-main-course" },
-  { name: "Fish Main Course", slug: "fish-main-course" },
-  { name: "Sizzler(Veg)", slug: "sizzler-veg" },
-  { name: "Sizzler(Non-Veg)", slug: "sizzler-non-veg" },
-  { name: "Veg Main Course", slug: "veg-main-course" },
-  { name: "Paneer Main Course", slug: "paneer-main-course" },
-  { name: "Mushroom Flavor", slug: "mushroom-flavor" },
-  { name: "Dal", slug: "dal" },
-  { name: "Soups(Veg)", slug: "soups-veg" },
-  { name: "Soups(Non-Veg)", slug: "soups-non-veg" },
-  { name: "Chineese Starter(Veg)", slug: "chineese-starter-veg" },
-  { name: "Chineese Starter(Non-Veg)", slug: "chineese-starter-non-veg" },
-  { name: "Beverages", slug: "beverages" },
-  { name: "Appetizer", slug: "appetizer" },
-  { name: "Indian Snacks(Veg)", slug: "indian-snacks-veg" },
-  { name: "Indian Snacks(Non-Veg)", slug: "indian-snacks-non-veg" },
-  { name: "Raita & Curd", slug: "raita-curd" },
-  { name: "Biryani & Pulav", slug: "biryani-pulav" },
-  { name: "Biryani", slug: "biryani" },
-  { name: "Desert", slug: "desert" },
-];
+type Category = {
+  id: string;
+  name: string;
+  image: string | null;
+  displayOrder: number;
+};
 
 const containerVariants = {
   hidden: { opacity: 0 },
   show: {
     opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-    },
+    transition: { staggerChildren: 0.07 },
   },
 };
 
@@ -49,13 +26,47 @@ const itemVariants = {
 };
 
 export function CategoryCards() {
-  const [mounted, setMounted] = useState(false);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setMounted(true);
+    fetch("/api/categories")
+      .then((r) => r.json())
+      .then((data) => {
+        setCategories(Array.isArray(data) ? data : []);
+      })
+      .catch(console.error)
+      .finally(() => setLoading(false));
   }, []);
 
-  if (!mounted) return null;
+  if (loading) {
+    return (
+      <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 lg:gap-8">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <div
+              key={i}
+              className="aspect-[4/3] md:aspect-square rounded-2xl bg-[#1E1E1E] animate-pulse"
+            />
+          ))}
+        </div>
+      </section>
+    );
+  }
+
+  if (categories.length === 0) {
+    return (
+      <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+        <div className="flex flex-col items-center justify-center gap-4 py-20 text-white/30">
+          <UtensilsCrossed className="w-12 h-12 opacity-40" />
+          <p className="font-montserrat text-lg">Menu categories coming soon…</p>
+          <p className="font-montserrat text-sm opacity-60">
+            Our team is preparing an extraordinary dining experience for you.
+          </p>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
@@ -66,20 +77,23 @@ export function CategoryCards() {
         viewport={{ once: true, margin: "-100px" }}
         className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 lg:gap-8"
       >
-        {CATEGORIES.map((category) => (
-          <Link key={category.slug} href={`/menu/${category.slug}`}>
+        {categories.map((category) => (
+          // Route uses the DB id so the item page can fetch exactly the right items
+          <Link key={category.id} href={`/menu/${category.id}`}>
             <motion.div
               variants={itemVariants}
               whileHover={{ y: -5 }}
               className="group relative aspect-[4/3] md:aspect-square rounded-2xl overflow-hidden cursor-pointer shadow-[0_4px_20px_rgba(0,0,0,0.5)] hover:shadow-[0_0_20px_rgba(201,162,39,0.3)] transition-shadow duration-300"
             >
-              {/* Background Image Placeholder */}
-              {/* Replace src with dynamic category images in the future */}
+              {/* Background Image */}
               <div className="absolute inset-0 bg-[#1E1E1E]">
                 <img
-                  src="/interior/img 6.png" 
+                  src={category.image || "/interior/img 6.png"}
                   alt={category.name}
                   className="w-full h-full object-cover opacity-60 group-hover:scale-110 transition-transform duration-700 ease-in-out"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = "/interior/img 6.png";
+                  }}
                 />
               </div>
 

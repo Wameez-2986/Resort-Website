@@ -22,14 +22,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     <div className="min-h-screen bg-[#0A0A0A] flex">
       {/* Sidebar */}
       <aside className="w-20 md:w-56 bg-[#111] border-r border-white/5 flex flex-col py-6 px-3 gap-2 fixed h-full z-20">
-        <div className="mb-6 px-2">
-          <p className="text-accent text-xs font-montserrat tracking-widest uppercase hidden md:block">
-            Control Panel
-          </p>
-          <h2 className="text-white font-playfair font-bold text-lg mt-1 hidden md:block">
-            Talav Resort
-          </h2>
-        </div>
+
 
         {NAV.map(({ href, label, icon: Icon }) => {
           const active = pathname.startsWith(href);

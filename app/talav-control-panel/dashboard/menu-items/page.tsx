@@ -158,75 +158,69 @@ export default function MenuItemsPage() {
       {/* Add/Edit Modal */}
       <AnimatePresence>
         {modalOpen && (
-          <>
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setModalOpen(false)} className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40" />
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto">
-              <div className="bg-[#1A1A1A] rounded-2xl border border-white/10 p-6 w-full max-w-md shadow-2xl my-auto">
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-lg font-playfair font-bold text-white">{editingId ? "Edit" : "Add"} Menu Item</h2>
-                  <button onClick={() => setModalOpen(false)} className="p-1.5 text-white/30 hover:text-white rounded-lg hover:bg-white/10 transition-all"><X className="w-4 h-4" /></button>
+          <motion.div key="menu-item-modal" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto">
+            <div onClick={() => setModalOpen(false)} className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+            <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }} className="relative z-10 bg-[#1A1A1A] rounded-2xl border border-white/10 p-6 w-full max-w-md shadow-2xl my-8">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-lg font-playfair font-bold text-white">{editingId ? "Edit" : "Add"} Menu Item</h2>
+                <button onClick={() => setModalOpen(false)} className="p-1.5 text-white/30 hover:text-white rounded-lg hover:bg-white/10 transition-all"><X className="w-4 h-4" /></button>
+              </div>
+              <div className="flex flex-col gap-4">
+                {[
+                  { label: "Item Name *", key: "name", placeholder: "e.g. Paneer Tikka" },
+                  { label: "Price (₹) *", key: "price", placeholder: "320" },
+                ].map(({ label, key, placeholder }) => (
+                  <div key={key}>
+                    <label className="block text-white/60 text-sm mb-1.5 font-montserrat">{label}</label>
+                    <input
+                      value={(form as any)[key]}
+                      onChange={(e) => setForm({ ...form, [key]: e.target.value })}
+                      placeholder={placeholder}
+                      type={key === "price" ? "number" : "text"}
+                      className="w-full bg-[#111] border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-accent/50 font-montserrat text-sm"
+                    />
+                  </div>
+                ))}
+                <div>
+                  <label className="block text-white/60 text-sm mb-1.5 font-montserrat">Category *</label>
+                  <select value={form.categoryId} onChange={(e) => setForm({ ...form, categoryId: e.target.value })}
+                    className="w-full bg-[#111] border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-accent/50 font-montserrat text-sm">
+                    <option value="">Select category…</option>
+                    {categories.map((cat) => <option key={cat.id} value={cat.id}>{cat.name}</option>)}
+                  </select>
                 </div>
-                <div className="flex flex-col gap-4">
-                  {[
-                    { label: "Item Name *", key: "name", placeholder: "e.g. Paneer Tikka" },
-                    { label: "Description", key: "description", placeholder: "Grilled cottage cheese..." },
-                    { label: "Price (₹) *", key: "price", placeholder: "320" },
-                    { label: "Image URL", key: "image", placeholder: "https://..." },
-                  ].map(({ label, key, placeholder }) => (
-                    <div key={key}>
-                      <label className="block text-white/60 text-sm mb-1.5 font-montserrat">{label}</label>
-                      <input
-                        value={(form as any)[key]}
-                        onChange={(e) => setForm({ ...form, [key]: e.target.value })}
-                        placeholder={placeholder}
-                        type={key === "price" ? "number" : "text"}
-                        className="w-full bg-[#111] border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-accent/50 font-montserrat text-sm"
-                      />
-                    </div>
-                  ))}
-                  <div>
-                    <label className="block text-white/60 text-sm mb-1.5 font-montserrat">Category *</label>
-                    <select value={form.categoryId} onChange={(e) => setForm({ ...form, categoryId: e.target.value })}
-                      className="w-full bg-[#111] border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-accent/50 font-montserrat text-sm">
-                      <option value="">Select category…</option>
-                      {categories.map((cat) => <option key={cat.id} value={cat.id}>{cat.name}</option>)}
-                    </select>
-                  </div>
-                  <div className="flex items-center justify-between py-2">
-                    <label className="font-montserrat text-sm text-white/60">Available</label>
-                    <button onClick={() => setForm({ ...form, available: !form.available })} className="transition-colors">
-                      {form.available ? <ToggleRight className="w-7 h-7 text-green-400" /> : <ToggleLeft className="w-7 h-7 text-white/20" />}
-                    </button>
-                  </div>
-                  {error && <p className="text-red-400 text-sm font-montserrat">{error}</p>}
-                  <button onClick={handleSave} disabled={saving}
-                    className="w-full py-3 bg-accent text-black font-semibold rounded-xl hover:bg-yellow-500 transition-all font-montserrat disabled:opacity-50 flex items-center justify-center gap-2">
-                    {saving ? "Saving…" : <><Check className="w-4 h-4" /> Save Item</>}
+                <div className="flex items-center justify-between py-2">
+                  <label className="font-montserrat text-sm text-white/60">Available</label>
+                  <button onClick={() => setForm({ ...form, available: !form.available })} className="transition-colors">
+                    {form.available ? <ToggleRight className="w-7 h-7 text-green-400" /> : <ToggleLeft className="w-7 h-7 text-white/20" />}
                   </button>
                 </div>
+                {error && <p className="text-red-400 text-sm font-montserrat">{error}</p>}
+                <button onClick={handleSave} disabled={saving}
+                  className="w-full py-3 bg-accent text-black font-semibold rounded-xl hover:bg-yellow-500 transition-all font-montserrat disabled:opacity-50 flex items-center justify-center gap-2">
+                  {saving ? "Saving…" : <><Check className="w-4 h-4" /> Save Item</>}
+                </button>
               </div>
             </motion.div>
-          </>
+          </motion.div>
         )}
       </AnimatePresence>
 
       {/* Delete Confirm */}
       <AnimatePresence>
         {deleteConfirm && (
-          <>
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setDeleteConfirm(null)} className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40" />
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="fixed inset-0 z-50 flex items-center justify-center p-4">
-              <div className="bg-[#1A1A1A] rounded-2xl border border-red-500/20 p-6 w-full max-w-sm shadow-2xl text-center">
-                <Trash2 className="w-10 h-10 text-red-400 mx-auto mb-4" />
-                <h2 className="text-lg font-playfair font-bold text-white mb-2">Delete Item?</h2>
-                <p className="text-white/50 font-montserrat text-sm mb-6">Delete <strong className="text-white">{deleteConfirm.name}</strong>?</p>
-                <div className="flex gap-3">
-                  <button onClick={() => setDeleteConfirm(null)} className="flex-1 py-2.5 rounded-xl border border-white/10 text-white/60 font-montserrat text-sm hover:bg-white/5 transition-all">Cancel</button>
-                  <button onClick={() => handleDelete(deleteConfirm)} className="flex-1 py-2.5 rounded-xl bg-red-500/20 border border-red-500/30 text-red-400 font-montserrat text-sm hover:bg-red-500/30 transition-all">Delete</button>
-                </div>
+          <motion.div key="delete-item-modal" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div onClick={() => setDeleteConfirm(null)} className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+            <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }} className="relative z-10 bg-[#1A1A1A] rounded-2xl border border-red-500/20 p-6 w-full max-w-sm shadow-2xl text-center">
+              <Trash2 className="w-10 h-10 text-red-400 mx-auto mb-4" />
+              <h2 className="text-lg font-playfair font-bold text-white mb-2">Delete Item?</h2>
+              <p className="text-white/50 font-montserrat text-sm mb-6">Delete <strong className="text-white">{deleteConfirm.name}</strong>?</p>
+              <div className="flex gap-3">
+                <button onClick={() => setDeleteConfirm(null)} className="flex-1 py-2.5 rounded-xl border border-white/10 text-white/60 font-montserrat text-sm hover:bg-white/5 transition-all">Cancel</button>
+                <button onClick={() => handleDelete(deleteConfirm)} className="flex-1 py-2.5 rounded-xl bg-red-500/20 border border-red-500/30 text-red-400 font-montserrat text-sm hover:bg-red-500/30 transition-all">Delete</button>
               </div>
             </motion.div>
-          </>
+          </motion.div>
         )}
       </AnimatePresence>
     </div>
