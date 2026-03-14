@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Pencil, Trash2, X, Check, ToggleLeft, ToggleRight } from "lucide-react";
+import { Plus, Pencil, Trash2, X, Check } from "lucide-react";
 
 type Category = { id: string; name: string };
 type MenuItem = {
@@ -72,13 +72,18 @@ export default function MenuItemsPage() {
     } finally { setSaving(false); }
   };
 
-  const toggleAvailability = async (item: MenuItem) => {
-    const res = await fetch(`/api/admin/menu-items/${item.id}`, {
+  const toggleAvailability = (item: MenuItem) => {
+    // Optimistic: flip the UI instantly
+    setItems((prev) => prev.map((i) => i.id === item.id ? { ...i, available: !i.available } : i));
+    // Sync with server in background
+    fetch(`/api/admin/menu-items/${item.id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ available: !item.available }),
+    }).catch(() => {
+      // Revert on failure
+      setItems((prev) => prev.map((i) => i.id === item.id ? { ...i, available: item.available } : i));
     });
-    if (res.ok) setItems((prev) => prev.map((i) => i.id === item.id ? { ...i, available: !i.available } : i));
   };
 
   const handleDelete = async (item: MenuItem) => {
@@ -115,42 +120,76 @@ export default function MenuItemsPage() {
           {filtered.length === 0 ? (
             <div className="p-16 text-center text-white/30 font-montserrat">No items found. Add some above.</div>
           ) : (
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-white/8">
-                  <th className="text-left px-5 py-3 text-white/40 font-montserrat text-xs uppercase tracking-wider">Item</th>
-                  <th className="text-left px-4 py-3 text-white/40 font-montserrat text-xs uppercase tracking-wider hidden md:table-cell">Category</th>
-                  <th className="text-right px-4 py-3 text-white/40 font-montserrat text-xs uppercase tracking-wider">Price</th>
-                  <th className="text-center px-4 py-3 text-white/40 font-montserrat text-xs uppercase tracking-wider">Status</th>
-                  <th className="px-4 py-3" />
-                </tr>
-              </thead>
-              <tbody>
+            <>
+              {/* ── Mobile card list (< md) ────────────────────────── */}
+              <div className="md:hidden divide-y divide-white/5">
                 {filtered.map((item) => (
-                  <tr key={item.id} className="border-b border-white/5 hover:bg-white/3 transition-colors">
-                    <td className="px-5 py-3">
-                      <p className="text-white font-montserrat font-medium text-sm">{item.name}</p>
-                      {item.description && <p className="text-white/30 text-xs mt-0.5 line-clamp-1">{item.description}</p>}
-                    </td>
-                    <td className="px-4 py-3 text-white/50 font-montserrat text-sm hidden md:table-cell">{item.category.name}</td>
-                    <td className="px-4 py-3 text-right text-accent font-semibold text-sm">₹{item.price}</td>
-                    <td className="px-4 py-3 text-center">
-                      <button onClick={() => toggleAvailability(item)} className="transition-all">
-                        {item.available
-                          ? <ToggleRight className="w-6 h-6 text-green-400 mx-auto" />
-                          : <ToggleLeft className="w-6 h-6 text-white/20 mx-auto" />}
-                      </button>
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center justify-end gap-2">
-                        <button onClick={() => openEdit(item)} className="p-2 text-white/30 hover:text-accent hover:bg-accent/10 rounded-lg transition-all"><Pencil className="w-4 h-4" /></button>
-                        <button onClick={() => setDeleteConfirm(item)} className="p-2 text-white/30 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-all"><Trash2 className="w-4 h-4" /></button>
-                      </div>
-                    </td>
-                  </tr>
+                  <div key={item.id} className="flex items-center gap-3 px-4 py-3">
+                    {/* Name + category */}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-white font-montserrat font-medium text-sm truncate">{item.name}</p>
+                      <p className="text-white/35 font-montserrat text-xs truncate">{item.category.name}</p>
+                    </div>
+                    {/* Price */}
+                    <span className="text-accent font-semibold text-sm shrink-0">₹{item.price}</span>
+                    {/* Toggle */}
+                    <button
+                      onClick={() => toggleAvailability(item)}
+                      className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-150 focus:outline-none ${
+                        item.available ? "bg-green-500" : "bg-white/15"
+                      }`}
+                      role="switch" aria-checked={item.available}
+                    >
+                      <span className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow-md transform transition-transform duration-150 ${item.available ? "translate-x-5" : "translate-x-0"}`} />
+                    </button>
+                    {/* Actions */}
+                    <button onClick={() => openEdit(item)} className="p-2 text-white/30 hover:text-accent hover:bg-accent/10 rounded-lg transition-all shrink-0"><Pencil className="w-4 h-4" /></button>
+                    <button onClick={() => setDeleteConfirm(item)} className="p-2 text-white/30 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-all shrink-0"><Trash2 className="w-4 h-4" /></button>
+                  </div>
                 ))}
-              </tbody>
-            </table>
+              </div>
+
+              {/* ── Desktop table (md+) ────────────────────────────── */}
+              <table className="hidden md:table w-full">
+                <thead>
+                  <tr className="border-b border-white/8">
+                    <th className="text-left px-5 py-3 text-white/40 font-montserrat text-xs uppercase tracking-wider">Item</th>
+                    <th className="text-left px-4 py-3 text-white/40 font-montserrat text-xs uppercase tracking-wider">Category</th>
+                    <th className="text-right px-4 py-3 text-white/40 font-montserrat text-xs uppercase tracking-wider">Price</th>
+                    <th className="text-center px-4 py-3 text-white/40 font-montserrat text-xs uppercase tracking-wider">Status</th>
+                    <th className="px-4 py-3" />
+                  </tr>
+                </thead>
+                <tbody>
+                  {filtered.map((item) => (
+                    <tr key={item.id} className="border-b border-white/5 hover:bg-white/3 transition-colors">
+                      <td className="px-5 py-3">
+                        <p className="text-white font-montserrat font-medium text-sm">{item.name}</p>
+                      </td>
+                      <td className="px-4 py-3 text-white/50 font-montserrat text-sm">{item.category.name}</td>
+                      <td className="px-4 py-3 text-right text-accent font-semibold text-sm">₹{item.price}</td>
+                      <td className="px-4 py-3 text-center">
+                        <button
+                          onClick={() => toggleAvailability(item)}
+                          className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-150 focus:outline-none ${
+                            item.available ? "bg-green-500" : "bg-white/15"
+                          }`}
+                          role="switch" aria-checked={item.available}
+                        >
+                          <span className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow-md transform transition-transform duration-150 ${item.available ? "translate-x-5" : "translate-x-0"}`} />
+                        </button>
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center justify-end gap-2">
+                          <button onClick={() => openEdit(item)} className="p-2 text-white/30 hover:text-accent hover:bg-accent/10 rounded-lg transition-all"><Pencil className="w-4 h-4" /></button>
+                          <button onClick={() => setDeleteConfirm(item)} className="p-2 text-white/30 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-all"><Trash2 className="w-4 h-4" /></button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </>
           )}
         </div>
       )}
@@ -191,8 +230,15 @@ export default function MenuItemsPage() {
                 </div>
                 <div className="flex items-center justify-between py-2">
                   <label className="font-montserrat text-sm text-white/60">Available</label>
-                  <button onClick={() => setForm({ ...form, available: !form.available })} className="transition-colors">
-                    {form.available ? <ToggleRight className="w-7 h-7 text-green-400" /> : <ToggleLeft className="w-7 h-7 text-white/20" />}
+                  <button
+                    onClick={() => setForm({ ...form, available: !form.available })}
+                    className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-150 focus:outline-none ${
+                      form.available ? "bg-green-500" : "bg-white/15"
+                    }`}
+                    role="switch"
+                    aria-checked={form.available}
+                  >
+                    <span className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow-md transform transition-transform duration-150 ${form.available ? "translate-x-5" : "translate-x-0"}`} />
                   </button>
                 </div>
                 {error && <p className="text-red-400 text-sm font-montserrat">{error}</p>}

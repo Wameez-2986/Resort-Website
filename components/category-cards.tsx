@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { UtensilsCrossed } from "lucide-react";
+import { UtensilsCrossed, ArrowRight } from "lucide-react";
 
 type Category = {
   id: string;
@@ -12,20 +12,7 @@ type Category = {
   displayOrder: number;
 };
 
-const containerVariants = {
-  hidden: { opacity: 0 },
-  show: {
-    opacity: 1,
-    transition: { staggerChildren: 0.07 },
-  },
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.5 } },
-};
-
-// ── Image lookup from public/categories ──────────────────────────────────────
+// ── Image map from public/categories ────────────────────────────────────────
 const CATEGORY_IMAGES: Record<string, string> = {
   "tandoor starter(veg)":             "/categories/tandoor starter(veg).png",
   "tandoor starter(non-veg)":         "/categories/tandoor starter(non-veg).png",
@@ -51,11 +38,35 @@ const CATEGORY_IMAGES: Record<string, string> = {
 const DEFAULT_CAT_IMAGE = "/categories/kofta khajana.png";
 
 function getCategoryImage(cat: { name: string; image: string | null }): string {
-  if (cat.image) return cat.image; // admin-uploaded takes priority
+  if (cat.image) return cat.image;
   return CATEGORY_IMAGES[cat.name.toLowerCase().trim()] ?? DEFAULT_CAT_IMAGE;
 }
 
+// ── Animation variants ───────────────────────────────────────────────────────
+const container = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.06 } },
+};
 
+const cardVariant = {
+  hidden: { opacity: 0, y: 32 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] } },
+};
+
+// ── Skeleton ─────────────────────────────────────────────────────────────────
+function Skeleton() {
+  return (
+    <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-5">
+        {Array.from({ length: 8 }).map((_, i) => (
+          <div key={i} className="aspect-[3/4] rounded-3xl bg-[#1A1A1A] animate-pulse" />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+// ── Main component ────────────────────────────────────────────────────────────
 export function CategoryCards() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
@@ -63,83 +74,92 @@ export function CategoryCards() {
   useEffect(() => {
     fetch("/api/categories")
       .then((r) => r.json())
-      .then((data) => {
-        setCategories(Array.isArray(data) ? data : []);
-      })
+      .then((data) => setCategories(Array.isArray(data) ? data : []))
       .catch(console.error)
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) {
-    return (
-      <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 lg:gap-8">
-          {Array.from({ length: 8 }).map((_, i) => (
-            <div
-              key={i}
-              className="aspect-[4/3] md:aspect-square rounded-2xl bg-[#1E1E1E] animate-pulse"
-            />
-          ))}
-        </div>
-      </section>
-    );
-  }
+  if (loading) return <Skeleton />;
 
   if (categories.length === 0) {
     return (
-      <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-        <div className="flex flex-col items-center justify-center gap-4 py-20 text-white/30">
-          <UtensilsCrossed className="w-12 h-12 opacity-40" />
-          <p className="font-montserrat text-lg">Menu categories coming soon…</p>
-          <p className="font-montserrat text-sm opacity-60">
-            Our team is preparing an extraordinary dining experience for you.
-          </p>
+      <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">
+        <div className="flex flex-col items-center justify-center gap-4 py-28 text-white/20">
+          <UtensilsCrossed className="w-14 h-14" />
+          <p className="font-montserrat text-base tracking-widest uppercase">Menu coming soon</p>
         </div>
       </section>
     );
   }
 
   return (
-    <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+    <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">
+
+      {/* Section header */}
+      <div className="flex flex-col items-center mb-12">
+        <p className="text-accent font-montserrat text-xs tracking-[0.3em] uppercase mb-3">
+          Our Offerings
+        </p>
+        <h2 className="text-3xl md:text-4xl font-playfair font-bold text-white text-center mb-4">
+          Explore the Menu
+        </h2>
+        <div className="flex items-center gap-3">
+          <div className="h-px w-16 bg-gradient-to-r from-transparent to-accent/60" />
+          <div className="w-1.5 h-1.5 rounded-full bg-accent" />
+          <div className="h-px w-16 bg-gradient-to-l from-transparent to-accent/60" />
+        </div>
+      </div>
+
+      {/* Grid */}
       <motion.div
-        variants={containerVariants}
+        variants={container}
         initial="hidden"
         whileInView="show"
-        viewport={{ once: true, margin: "-100px" }}
-        className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 lg:gap-8"
+        viewport={{ once: true, margin: "-80px" }}
+        className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-5"
       >
         {categories.map((category) => (
-          // Route uses the DB id so the item page can fetch exactly the right items
-          <Link key={category.id} href={`/menu/${category.id}`}>
-            <motion.div
-              variants={itemVariants}
-              whileHover={{ y: -5 }}
-              className="group relative aspect-[4/3] md:aspect-square rounded-2xl overflow-hidden cursor-pointer shadow-[0_4px_20px_rgba(0,0,0,0.5)] hover:shadow-[0_0_20px_rgba(201,162,39,0.3)] transition-shadow duration-300"
-            >
-              {/* Background Image */}
-              <div className="absolute inset-0 bg-[#1E1E1E]">
+          <motion.div key={category.id} variants={cardVariant}>
+            <Link href={`/menu/${category.id}`} className="block group">
+              <div className="relative aspect-[3/4] rounded-3xl overflow-hidden shadow-[0_8px_40px_rgba(0,0,0,0.6)] ring-1 ring-white/5 group-hover:ring-accent/40 transition-all duration-500">
+
+                {/* Photo */}
                 <img
                   src={getCategoryImage(category)}
                   alt={category.name}
-                  className="w-full h-full object-cover opacity-60 group-hover:scale-110 transition-transform duration-700 ease-in-out"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).src = DEFAULT_CAT_IMAGE;
-                  }}
+                  className="absolute inset-0 w-full h-full object-cover scale-100 group-hover:scale-110 transition-transform duration-700 ease-in-out"
+                  onError={(e) => { (e.target as HTMLImageElement).src = DEFAULT_CAT_IMAGE; }}
                 />
-              </div>
 
-              {/* Dark Gradient Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-[#0F0F0F] via-[#0F0F0F]/60 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-300" />
+                {/* Base dark scrim */}
+                <div className="absolute inset-0 bg-black/40" />
 
-              {/* Content */}
-              <div className="absolute inset-0 p-4 md:p-6 flex flex-col justify-end">
-                <h3 className="text-white font-montserrat font-semibold text-sm md:text-base lg:text-lg leading-tight group-hover:text-accent transition-colors duration-300">
-                  {category.name}
-                </h3>
-                <div className="w-8 h-0.5 bg-accent mt-3 scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-300" />
+                {/* Bottom gradient */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
+
+                {/* Gold shimmer on hover */}
+                <div className="absolute inset-0 bg-gradient-to-br from-accent/0 via-accent/0 to-accent/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+                {/* Gold top line */}
+                <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-accent/60 to-transparent scale-x-0 group-hover:scale-x-100 transition-transform duration-500" />
+
+                {/* Content */}
+                <div className="absolute inset-0 flex flex-col justify-end p-4 md:p-5">
+                  <h3 className="text-white font-montserrat font-semibold text-sm md:text-base leading-snug drop-shadow-lg group-hover:text-accent transition-colors duration-300">
+                    {category.name}
+                  </h3>
+
+                  {/* Animated CTA */}
+                  <div className="flex items-center gap-1.5 mt-2 overflow-hidden h-5">
+                    <span className="text-accent/0 group-hover:text-accent text-[11px] font-montserrat tracking-widest uppercase translate-y-4 group-hover:translate-y-0 transition-all duration-300 delay-75">
+                      Explore
+                    </span>
+                    <ArrowRight className="w-3 h-3 text-accent/0 group-hover:text-accent translate-y-4 group-hover:translate-y-0 transition-all duration-300 delay-100" />
+                  </div>
+                </div>
               </div>
-            </motion.div>
-          </Link>
+            </Link>
+          </motion.div>
         ))}
       </motion.div>
     </section>
