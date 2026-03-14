@@ -50,7 +50,7 @@ const container = {
 
 const cardVariant = {
   hidden: { opacity: 0, y: 32 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] } },
+  show: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] as any } },
 };
 
 // ── Skeleton ─────────────────────────────────────────────────────────────────
@@ -67,17 +67,18 @@ function Skeleton() {
 }
 
 // ── Main component ────────────────────────────────────────────────────────────
-export function CategoryCards() {
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState(true);
+export function CategoryCards({ initialCategories }: { initialCategories?: Category[] }) {
+  const [categories, setCategories] = useState<Category[]>(initialCategories || []);
+  const [loading, setLoading] = useState(!initialCategories);
 
   useEffect(() => {
+    if (initialCategories) return;
     fetch("/api/categories")
       .then((r) => r.json())
       .then((data) => setCategories(Array.isArray(data) ? data : []))
       .catch(console.error)
       .finally(() => setLoading(false));
-  }, []);
+  }, [initialCategories]);
 
   if (loading) return <Skeleton />;
 

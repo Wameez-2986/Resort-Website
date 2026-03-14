@@ -62,10 +62,16 @@ function ItemCard({ item, categoryName }: { item: MenuItem; categoryName: string
 }
 
 // ── Main component ────────────────────────────────────────────────────────────
-export function MenuSearch({ onQueryChange }: { onQueryChange?: (q: string) => void }) {
-  const [allCategories, setAllCategories] = useState<Category[]>([]);
+export function MenuSearch({
+  onQueryChange,
+  initialData,
+}: {
+  onQueryChange?: (q: string) => void;
+  initialData?: Category[];
+}) {
+  const [allCategories, setAllCategories] = useState<Category[]>(initialData || []);
   const [query, setQuery] = useState("");
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!initialData);
 
   const handleQuery = (val: string) => {
     setQuery(val);
@@ -73,11 +79,12 @@ export function MenuSearch({ onQueryChange }: { onQueryChange?: (q: string) => v
   };
 
   useEffect(() => {
+    if (initialData) return;
     fetch("/api/menu")
       .then((r) => r.json())
       .then((data) => setAllCategories(Array.isArray(data) ? data : []))
       .finally(() => setLoading(false));
-  }, []);
+  }, [initialData]);
 
   // ── Filter logic ─────────────────────────────────────────────────────────
   const q = query.trim().toLowerCase();

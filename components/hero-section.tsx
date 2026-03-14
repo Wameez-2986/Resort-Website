@@ -12,7 +12,7 @@ const IMAGES = [
   "/exterior/img 5.png",
 ];
 
-const CATEGORIES = ["Starters", "Main Course", "Desserts"];
+
 
 export function HeroSection() {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -58,16 +58,6 @@ export function HeroSection() {
       {/* Content Overlay */}
       <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center z-10">
         
-        {/* Table Badge */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5, duration: 0.8 }}
-          className="mb-8 px-4 py-1.5 rounded-full border border-accent text-accent bg-background/20 backdrop-blur-sm text-sm font-medium tracking-widest uppercase"
-        >
-          Table 12
-        </motion.div>
-
         {/* Resort Name */}
         <motion.h1
           initial={{ opacity: 0, scale: 0.95 }}
@@ -112,22 +102,6 @@ export function HeroSection() {
             Explore Menu
           </Link>
         </motion.div>
-      </div>
-
-      {/* Bottom Category Quick Links */}
-      <div className="absolute bottom-0 inset-x-0 p-4 bg-gradient-to-t from-black/80 to-transparent z-10 border-t border-accent/20">
-        <ul className="flex items-center justify-center gap-4 text-sm font-montserrat text-white/90">
-          {CATEGORIES.map((cat, i) => (
-            <li key={cat} className="flex items-center">
-              <button className="hover:text-accent transition-colors py-2 uppercase tracking-wider text-xs md:text-sm">
-                {cat}
-              </button>
-              {i < CATEGORIES.length - 1 && (
-                <span className="mx-4 text-accent/50">|</span>
-              )}
-            </li>
-          ))}
-        </ul>
       </div>
     </section>
   );
