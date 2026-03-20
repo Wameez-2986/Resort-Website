@@ -15,7 +15,7 @@ type Order = {
   id: string;
   tableNumber: string;
   notes?: string | null;
-  status: "Pending" | "Preparing" | "Ready" | "Served" | string;
+  status: "Pending" | "Preparing" | "Ready" | "Served";
   totalPrice: number;
   createdAt: string;
   items: OrderItem[];
@@ -123,7 +123,7 @@ export default function OrdersPage() {
         <motion.div layout className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           <AnimatePresence>
             {orders.map((order) => {
-              const meta = STATUS_META[order.status];
+              const meta = STATUS_META[order.status as keyof typeof STATUS_META];
               return (
                 <motion.div
                   key={order.id}
