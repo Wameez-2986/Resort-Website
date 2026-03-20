@@ -31,10 +31,22 @@ const CATEGORIES = [
 
 const prisma = new PrismaClient();
 
+function slugify(text: string): string {
+  return text
+    .toString()
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, '-')
+    .replace(/[^\w-]+/g, '')
+    .replace(/--+/g, '-')
+    .replace(/^-+/, '')
+    .replace(/-+$/, '');
+}
+
 async function main() {
   console.log("🌱 Seeding database...");
 
-  // Upsert admin PIN
+  // ... (admin PIN remains the same)
   await prisma.admin.upsert({
     where: { pin: "458273" },
     update: {},
@@ -44,10 +56,19 @@ async function main() {
 
   // Upsert all categories
   for (let i = 0; i < CATEGORIES.length; i++) {
+    const name = CATEGORIES[i];
+    const slug = slugify(name);
     await prisma.category.upsert({
-      where: { name: CATEGORIES[i] },
-      update: { displayOrder: i },
-      create: { name: CATEGORIES[i], displayOrder: i },
+      where: { name: name },
+      update: { 
+        displayOrder: i, 
+        slug: slug 
+      } as any,
+      create: { 
+        name: name, 
+        displayOrder: i, 
+        slug: slug 
+      } as any,
     });
   }
   console.log(`✅ ${CATEGORIES.length} categories seeded`);
