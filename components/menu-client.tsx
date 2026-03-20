@@ -16,6 +16,7 @@ type MenuItem = {
 type Category = {
   id: string;
   name: string;
+  slug: string;
   image: string | null;
   menuItems: MenuItem[];
 };
