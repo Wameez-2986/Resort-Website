@@ -9,10 +9,10 @@ export default async function CategoryPage({
 }: {
   params: Promise<{ category: string }>;
 }) {
-  const { category: categoryId } = await params;
+  const { category: slug } = await params;
 
   const data = await prisma.category.findUnique({
-    where: { id: categoryId },
+    where: { slug },
     include: {
       menuItems: {
         where: { available: true },

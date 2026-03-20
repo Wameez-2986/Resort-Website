@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { slugify } from "@/lib/slugify";
 
 // PUT update category
 export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -10,7 +11,12 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
 
     const category = await prisma.category.update({
       where: { id },
-      data: { name, image: image ?? undefined, displayOrder: displayOrder ?? undefined },
+      data: { 
+        name, 
+        slug: name ? slugify(name) : undefined,
+        image: image ?? undefined, 
+        displayOrder: displayOrder ?? undefined 
+      },
     });
 
     return NextResponse.json(category);

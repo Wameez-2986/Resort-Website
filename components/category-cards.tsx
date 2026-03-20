@@ -8,6 +8,7 @@ import { UtensilsCrossed, ArrowRight } from "lucide-react";
 type Category = {
   id: string;
   name: string;
+  slug: string;
   image: string | null;
   displayOrder: number;
 };
@@ -121,7 +122,7 @@ export function CategoryCards({ initialCategories }: { initialCategories?: Categ
       >
         {categories.map((category) => (
           <motion.div key={category.id} variants={cardVariant}>
-            <Link href={`/menu/${category.id}`} className="block group">
+            <Link href={`/menu/${category.slug}`} className="block group">
               <div className="relative aspect-[3/4] rounded-3xl overflow-hidden shadow-[0_8px_40px_rgba(0,0,0,0.6)] ring-1 ring-white/5 group-hover:ring-accent/40 transition-all duration-500">
 
                 {/* Photo */}

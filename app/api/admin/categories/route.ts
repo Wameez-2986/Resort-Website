@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { slugify } from "@/lib/slugify";
 
 // GET all categories ordered by displayOrder
 export async function GET() {
@@ -25,7 +26,12 @@ export async function POST(request: Request) {
     }
 
     const category = await prisma.category.create({
-      data: { name, image: image || null, displayOrder: displayOrder ?? 0 },
+      data: { 
+        name, 
+        slug: slugify(name),
+        image: image || null, 
+        displayOrder: displayOrder ?? 0 
+      },
     });
 
     return NextResponse.json(category, { status: 201 });

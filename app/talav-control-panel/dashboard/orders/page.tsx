@@ -14,7 +14,8 @@ type OrderItem = {
 type Order = {
   id: string;
   tableNumber: string;
-  status: "Pending" | "Preparing" | "Ready" | "Served";
+  notes?: string | null;
+  status: "Pending" | "Preparing" | "Ready" | "Served" | string;
   totalPrice: number;
   createdAt: string;
   items: OrderItem[];
@@ -159,6 +160,16 @@ export default function OrdersPage() {
                       </div>
                     ))}
                   </div>
+
+                  {/* Notes */}
+                  {order.notes && (
+                    <div className="bg-white/5 rounded-xl p-3 border border-white/5">
+                      <p className="text-[10px] uppercase tracking-wider text-white/30 font-montserrat font-bold mb-1">Order Notes</p>
+                      <p className="text-sm text-yellow-200/80 font-montserrat italic">
+                        "{order.notes}"
+                      </p>
+                    </div>
+                  )}
 
                   {/* Footer */}
                   <div className="border-t border-white/5 pt-3 flex justify-between items-center">

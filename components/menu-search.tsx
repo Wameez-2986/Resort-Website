@@ -17,6 +17,7 @@ type MenuItem = {
 type Category = {
   id: string;
   name: string;
+  slug: string;
   image: string | null;
   menuItems: MenuItem[];
 };
@@ -177,7 +178,7 @@ export function MenuSearch({
                     <h3 className="text-base font-montserrat font-semibold text-accent">{cat.name}</h3>
                     <div className="flex-1 h-px bg-white/5" />
                     <Link
-                      href={`/menu/${cat.id}`}
+                      href={`/menu/${cat.slug}`}
                       className="text-xs font-montserrat text-white/30 hover:text-accent transition-colors"
                     >
                       View all →

@@ -23,6 +23,7 @@ model Admin {
 model Category {
   id           String     @id @default(cuid())
   name         String     @unique
+  slug         String     @unique
   image        String?
   displayOrder Int        @default(0)
   createdAt    DateTime   @default(now())
@@ -54,6 +55,7 @@ enum OrderStatus {
 model Order {
   id          String      @id @default(cuid())
   tableNumber String
+  notes       String?
   status      OrderStatus @default(Pending)
   totalPrice  Float
   items       OrderItem[]

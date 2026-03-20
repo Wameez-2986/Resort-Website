@@ -5,7 +5,7 @@ import orderEmitter from "@/lib/orderEmitter";
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { tableNumber, items, totalPrice } = body;
+    const { tableNumber, items, totalPrice, notes } = body;
 
     if (!tableNumber || !items || items.length === 0) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
@@ -16,6 +16,7 @@ export async function POST(request: Request) {
       data: {
         tableNumber: String(tableNumber),
         totalPrice: parseFloat(totalPrice),
+        notes: notes || null,
         items: {
           create: items.map((item: { id: string; name: string; quantity: number; price: number }) => ({
             menuItemId: item.id,
