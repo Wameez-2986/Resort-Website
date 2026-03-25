@@ -19,7 +19,7 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { name, image, displayOrder } = body;
+    const { name, image, imageKey, displayOrder } = body;
 
     if (!name) {
       return NextResponse.json({ error: "Category name is required" }, { status: 400 });
@@ -30,6 +30,7 @@ export async function POST(request: Request) {
         name, 
         slug: slugify(name),
         image: image || null, 
+        imageKey: imageKey || null,
         displayOrder: displayOrder ?? 0 
       },
     });

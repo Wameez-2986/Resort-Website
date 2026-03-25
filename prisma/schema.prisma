@@ -25,6 +25,7 @@ model Category {
   name         String     @unique
   slug         String     @unique
   image        String?
+  imageKey     String?
   displayOrder Int        @default(0)
   createdAt    DateTime   @default(now())
   menuItems    MenuItem[]
@@ -36,6 +37,7 @@ model MenuItem {
   description String?
   price       Float
   image       String?
+  imageKey    String?
   available   Boolean     @default(true)
   categoryId  String
   category    Category    @relation(fields: [categoryId], references: [id], onDelete: Cascade)

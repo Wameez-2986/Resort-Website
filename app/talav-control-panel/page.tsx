@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { Delete } from "lucide-react";
@@ -33,6 +33,20 @@ export default function AdminLoginPage() {
       submitPin(newPin);
     }
   };
+
+  // Allow typing on physical keyboard
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (loading) return;
+      if (e.key === "Backspace") {
+        handleKey("del");
+      } else if (/^[0-9]$/.test(e.key)) {
+        handleKey(Number(e.key) as any);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [pin, loading]);
 
   const submitPin = async (pinToSubmit: string) => {
     setLoading(true);

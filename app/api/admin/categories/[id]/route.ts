@@ -7,7 +7,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
   try {
     const { id } = await params;
     const body = await request.json();
-    const { name, image, displayOrder } = body;
+    const { name, image, imageKey, displayOrder } = body;
 
     const category = await prisma.category.update({
       where: { id },
@@ -15,6 +15,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
         name, 
         slug: name ? slugify(name) : undefined,
         image: image ?? undefined, 
+        imageKey: imageKey ?? undefined,
         displayOrder: displayOrder ?? undefined 
       },
     });

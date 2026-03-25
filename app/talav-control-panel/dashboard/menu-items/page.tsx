@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Pencil, Trash2, X, Check } from "lucide-react";
+import { Plus, Pencil, Trash2, X, Check, Loader2 } from "lucide-react";
 
 type Category = { id: string; name: string };
 type MenuItem = {
@@ -11,12 +11,13 @@ type MenuItem = {
   description: string | null;
   price: number;
   image: string | null;
+  imageKey: string | null;
   available: boolean;
   categoryId: string;
   category: { id: string; name: string };
 };
 
-const DEFAULT_FORM = { name: "", description: "", price: "", image: "", categoryId: "", available: true };
+const DEFAULT_FORM = { name: "", description: "", price: "", categoryId: "", available: true };
 
 export default function MenuItemsPage() {
   const [items, setItems] = useState<MenuItem[]>([]);
@@ -50,7 +51,13 @@ export default function MenuItemsPage() {
   };
 
   const openEdit = (item: MenuItem) => {
-    setForm({ name: item.name, description: item.description || "", price: String(item.price), image: item.image || "", categoryId: item.categoryId, available: item.available });
+    setForm({ 
+      name: item.name, 
+      description: item.description || "", 
+      price: String(item.price), 
+      categoryId: item.categoryId, 
+      available: item.available 
+    });
     setEditingId(item.id);
     setError("");
     setModalOpen(true);
@@ -65,7 +72,7 @@ export default function MenuItemsPage() {
       const res = await fetch(url, {
         method: editingId ? "PUT" : "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...form }),
       });
       if (res.ok) { await fetchData(); setModalOpen(false); }
       else { const d = await res.json(); setError(d.error || "Failed to save"); }
@@ -235,12 +242,11 @@ export default function MenuItemsPage() {
                     className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-150 focus:outline-none ${
                       form.available ? "bg-green-500" : "bg-white/15"
                     }`}
-                    role="switch"
-                    aria-checked={form.available}
                   >
                     <span className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow-md transform transition-transform duration-150 ${form.available ? "translate-x-5" : "translate-x-0"}`} />
                   </button>
                 </div>
+
                 {error && <p className="text-red-400 text-sm font-montserrat">{error}</p>}
                 <button onClick={handleSave} disabled={saving}
                   className="w-full py-3 bg-accent text-black font-semibold rounded-xl hover:bg-yellow-500 transition-all font-montserrat disabled:opacity-50 flex items-center justify-center gap-2">

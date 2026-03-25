@@ -6,7 +6,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
   try {
     const { id } = await params;
     const body = await request.json();
-    const { name, description, price, image, categoryId, available } = body;
+    const { name, description, price, image, imageKey, categoryId, available } = body;
 
     const item = await prisma.menuItem.update({
       where: { id },
@@ -15,6 +15,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
         description: description ?? undefined,
         price: price !== undefined ? parseFloat(price) : undefined,
         image: image ?? undefined,
+        imageKey: imageKey ?? undefined,
         categoryId: categoryId ?? undefined,
         available: available ?? undefined,
       },

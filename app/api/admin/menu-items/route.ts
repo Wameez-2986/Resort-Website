@@ -18,7 +18,7 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { name, description, price, image, categoryId, available } = body;
+    const { name, description, price, image, imageKey, categoryId, available } = body;
 
     if (!name || !price || !categoryId) {
       return NextResponse.json({ error: "Name, price and category are required" }, { status: 400 });
@@ -30,6 +30,7 @@ export async function POST(request: Request) {
         description: description || null,
         price: parseFloat(price),
         image: image || null,
+        imageKey: imageKey || null,
         categoryId,
         available: available ?? true,
       },
